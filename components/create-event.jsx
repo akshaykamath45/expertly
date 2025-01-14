@@ -37,7 +37,7 @@ export function CreateEventDrawer() {
           <DrawerTitle>Create new event</DrawerTitle>
         </DrawerHeader>
         <EventForm
-          onSubmit={() => {
+          onSubmitForm={() => {
             handleClose();
           }}
         />
