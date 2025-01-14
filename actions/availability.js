@@ -1,35 +1,36 @@
 "use server";
+
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
 export async function getUserAvailability() {
+  // fetch the authenticated user's id
   const { userId } = await auth();
+
+  // throw an error if no user id is found
   if (!userId) {
-    throw new Error("Unauthorized: No user ID found.");
+    throw new Error("unauthorized");
   }
-  // finding user in db
-  // Fetch the user from the database based on their unique Clerk user ID
+
+  // retrieve the user from the database, including their availability and days
   const user = await db.user.findUnique({
-    where: { clerkUserId: userId }, // Look for a user with a `clerkUserId` matching the provided `userId`
+    where: { clerkUserId: userId },
     include: {
       availability: {
-        // Include the `availability` relationship
-        include: { days: true }, // Also include the related `days` (list of day-specific availability)
+        include: { days: true }, // include all day-specific availability
       },
     },
   });
 
-  // Check if the user or their availability data doesn't exist
+  // return null if no user or availability data is found
   if (!user || !user.availability) {
-    return null; // If no user or availability data is found, return `null`
+    return null;
   }
 
-  // Initialize an object to hold the transformed availability data
-  const availabilityData = {
-    timeGap: user.availability.timeGap, // Add the `timeGap` field (minimum gap between bookings in minutes)
-  };
+  // initialize the availability data object with the time gap
+  const availabilityData = { timeGap: user.availability.timeGap };
 
-  // Define the days of the week to iterate over
+  // loop through the days of the week to construct the availability data
   [
     "monday",
     "tuesday",
@@ -39,23 +40,94 @@ export async function getUserAvailability() {
     "saturday",
     "sunday",
   ].forEach((day) => {
-    // For each day, find the corresponding availability entry
+    // find the availability data for the specific day
     const dayAvailability = user.availability.days.find(
-      (d) => d.day === day.toUpperCase() // Compare the day string in uppercase (e.g., "MONDAY")
+      (d) => d.day === day.toUpperCase() // match the day in uppercase
     );
 
-    // Add the availability data for the current day to the `availabilityData` object
+    // set the availability, start time, and end time for the day
     availabilityData[day] = {
-      isAvailable: !!dayAvailability, // `true` if `dayAvailability` exists, otherwise `false`
+      isAvailable: !!dayAvailability, // true if data exists, false otherwise
       startTime: dayAvailability
-        ? dayAvailability.startTime.toISOString().slice(11, 16) // Format `startTime` as "HH:MM" if available
-        : "09:00", // Default start time if no availability exists
+        ? dayAvailability.startTime.toISOString().slice(11, 16) // extract hh:mm format
+        : "09:00", // default start time
       endTime: dayAvailability
-        ? dayAvailability.endTime.toISOString().slice(11, 16) // Format `endTime` as "HH:MM" if available
-        : "17:00", // Default end time if no availability exists
+        ? dayAvailability.endTime.toISOString().slice(11, 16) // extract hh:mm format
+        : "17:00", // default end time
     };
   });
 
-  // Return the fully constructed availability data object
+  // return the transformed availability data
   return availabilityData;
+}
+
+export async function updateAvailability(data) {
+  // fetch the authenticated user's id
+  const { userId } = await auth();
+
+  // throw an error if no user id is found
+  if (!userId) {
+    throw new Error("unauthorized");
+  }
+
+  // retrieve the user from the database, including their availability
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+    include: { availability: true }, // include general availability details
+  });
+
+  // throw an error if no user is found
+  if (!user) {
+    throw new Error("user not found");
+  }
+
+  // map the input data into an array of availability objects
+  const availabilityData = Object.entries(data).flatMap(
+    ([day, { isAvailable, startTime, endTime }]) => {
+      if (isAvailable) {
+        // get the current date in yyyy-mm-dd format for creating datetime
+        const baseDate = new Date().toISOString().split("T")[0];
+
+        // return an object with day, start time, and end time if available
+        return [
+          {
+            day: day.toUpperCase(),
+            startTime: new Date(`${baseDate}T${startTime}:00Z`),
+            endTime: new Date(`${baseDate}T${endTime}:00Z`),
+          },
+        ];
+      }
+      // return an empty array if not available
+      return [];
+    }
+  );
+
+  // check if the user already has availability data
+  if (user.availability) {
+    // update the user's existing availability
+    await db.availability.update({
+      where: { id: user.availability.id },
+      data: {
+        timeGap: data.timeGap, // update the time gap
+        days: {
+          deleteMany: {}, // delete all existing days
+          create: availabilityData, // add the new days
+        },
+      },
+    });
+  } else {
+    // create new availability data for the user
+    await db.availability.create({
+      data: {
+        userId: user.id,
+        timeGap: data.timeGap, // set the time gap
+        days: {
+          create: availabilityData, // add the new days
+        },
+      },
+    });
+  }
+
+  // return a success response
+  return { success: true };
 }

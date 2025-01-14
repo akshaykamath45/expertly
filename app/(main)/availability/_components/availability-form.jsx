@@ -14,6 +14,8 @@ import { Controller, useForm } from "react-hook-form";
 import { timeSlots } from "../data";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import useFetch from "@/hooks/use-fetch";
+import { updateAvailability } from "@/actions/availability";
 const AvailabilityForm = ({ initialData }) => {
   const {
     register,
@@ -26,9 +28,18 @@ const AvailabilityForm = ({ initialData }) => {
     resolver: zodResolver(availabilitySchema),
     defaultValues: { ...initialData },
   });
+  const {
+    fn: fnUpdateAvailability,
+    loading,
+    error,
+  } = useFetch(updateAvailability);
+
+  const onSubmit = async (data) => {
+    await fnUpdateAvailability(data);
+  };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit(onSubmit)}>
       {[
         "monday",
         "tuesday",
@@ -44,7 +55,7 @@ const AvailabilityForm = ({ initialData }) => {
             <Controller
               name={`${day}.isAvailable`}
               control={control}
-              render={(field) => {
+              render={({ field }) => {
                 return (
                   <Checkbox
                     checked={field.value}
@@ -68,7 +79,7 @@ const AvailabilityForm = ({ initialData }) => {
                 <Controller
                   name={`${day}.startTime`}
                   control={control}
-                  render={(field) => {
+                  render={({ field }) => {
                     return (
                       <Select
                         onValueChange={field.onChange}
@@ -94,7 +105,7 @@ const AvailabilityForm = ({ initialData }) => {
                 <Controller
                   name={`${day}.endTime`}
                   control={control}
-                  render={(field) => {
+                  render={({ field }) => {
                     return (
                       <Select
                         onValueChange={field.onChange}
@@ -141,8 +152,9 @@ const AvailabilityForm = ({ initialData }) => {
           </span>
         )}
       </div>
-      <Button type="submit" className="mt-8">
-        Update availability
+      {error && <div className="text-red-500 text-sm">{error?.message}</div>}
+      <Button type="submit" className="mt-8" disabled={loading}>
+        {loading ? "Updating" : "Update availability"}
       </Button>
     </form>
   );
