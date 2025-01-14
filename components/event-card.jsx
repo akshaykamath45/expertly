@@ -39,8 +39,20 @@ const EventCard = ({ event, username, isPublic = false }) => {
       router.refresh();
     }
   };
+  // if not equal to copy and delete button, to differentiate
+  const handleCardClick = (e) => {
+    if (e.target.tagName !== "BUTTON" && e.target.tagName !== "SVG") {
+      window?.open(
+        `${window?.location.origin}/${username}/${event.id}`,
+        "_blank"
+      );
+    }
+  };
   return (
-    <Card className="flex flex-col justify-between cursor-pointer">
+    <Card
+      className="flex flex-col justify-between cursor-pointer"
+      onClick={handleCardClick}
+    >
       <CardHeader>
         <CardTitle>{event.title}</CardTitle>
         <CardDescription className="flex justify-between">
