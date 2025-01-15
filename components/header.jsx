@@ -1,20 +1,13 @@
-"use client";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
 import { PenBox } from "lucide-react";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import UserMenu from "./user-menu";
-import { useRouter } from "next/navigation";
-
-const Header = () => {
-  const router = useRouter();
-
-  const handleSignInClick = () => {
-    router.push("/sign-in"); // Redirect to the /sign-in route
-  };
-
+import { checkUser } from "@/lib/checkUser";
+const Header = async () => {
+  await checkUser();
   return (
     <nav className="mx-auto py-2 px-4 flex justify-between items-center shadow-md border-b-2">
       <Link href={"/"} className="flex items-center">
@@ -34,9 +27,9 @@ const Header = () => {
           </Button>
         </Link>
         <SignedOut>
-          <Button variant="outlined" onClick={handleSignInClick}>
-            Login
-          </Button>
+          <SignInButton forceRedirectUrl="/dashboard">
+            <Button variant="outlined">Login</Button>
+          </SignInButton>
         </SignedOut>
         <SignedIn>
           <UserMenu />
