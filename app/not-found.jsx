@@ -1,11 +1,7 @@
-import React from "react";
-
-const NotFound = () => {
+export default function NotFound() {
   return (
-    <div className="text-4xl font-extrabold w-screen pt-80 grid justify-center">
-      <h1>404 - Page not found</h1>
+    <div className="text-4xl font-extrabold w-screen pt-96 grid place-items-center">
+      <h1>404 - Page Not Found</h1>
     </div>
   );
-};
-
-export default NotFound;
+}
