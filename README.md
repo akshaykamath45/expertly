@@ -70,7 +70,6 @@
 6. **Data Update**: Updates the user's existing availability or creates new availability data if none exists.
 7. **Return Success**: Returns a success response if the update is successful.
 
-Certainly! Let's break down the actions in `events.js` and `bookings.js` in detail, explaining what each function does step by step.
 
 ### `actions/events.js`
 
