@@ -24,7 +24,7 @@ const UserPage = async ({ params }) => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col items-center mb-10 gap-4">
-        <Avatar>
+        <Avatar className="w-24 h-24 mb-4">
           <AvatarImage src={user.imageUrl} alt={user.name} />
           <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
         </Avatar>
