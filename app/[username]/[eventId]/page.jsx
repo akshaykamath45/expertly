@@ -19,7 +19,7 @@ const EventPage = async ({ params }) => {
   // console.log(params.username);
   const event = await getEventDetails(params.username, params.eventId);
   const availability = await getEventAvailability(params.eventId);
-  console.log(availability);
+  // console.log(availability);
   if (!event) {
     notFound();
   }
@@ -27,7 +27,7 @@ const EventPage = async ({ params }) => {
     <div className="flex flex-col justify-center lg:flex-row px-4 py-8">
       <EventDetails event={event} />
       <Suspense fallback={<div>Loading booking form...</div>}>
-        <BookingForm />
+        <BookingForm event={event} availability={availability} />
       </Suspense>
     </div>
   );
