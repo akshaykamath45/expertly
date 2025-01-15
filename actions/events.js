@@ -161,7 +161,9 @@ export async function getEventAvailability(eventId) {
     const dayOfWeek = format(date, "EEEE").toUpperCase();
 
     // find the user's availability for this day
-    const dayAvailability = availability.days.find((d) => d.day === dayOfWeek);
+    const dayAvailability = availability?.days?.find(
+      (d) => d.day === dayOfWeek
+    );
 
     // if the user is available on this day
     if (dayAvailability) {
@@ -184,9 +186,9 @@ export async function getEventAvailability(eventId) {
         slots,
       });
     }
-    // return the list of available dates and slots
-    return availableDates;
   }
+  // return the list of available dates and slots
+  return availableDates;
 }
 
 function generateAvailableTimeSlots(

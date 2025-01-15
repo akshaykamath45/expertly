@@ -1,4 +1,4 @@
-import { getEventDetails } from "@/actions/events";
+import { getEventAvailability, getEventDetails } from "@/actions/events";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import EventDetails from "./_components/event-details";
@@ -18,6 +18,8 @@ export async function generateMetadata({ params }) {
 const EventPage = async ({ params }) => {
   // console.log(params.username);
   const event = await getEventDetails(params.username, params.eventId);
+  const availability = await getEventAvailability(params.eventId);
+  console.log(availability);
   if (!event) {
     notFound();
   }
