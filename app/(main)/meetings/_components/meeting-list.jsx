@@ -10,6 +10,7 @@ import {
 import { format } from "date-fns";
 import { Calendar, Clock, Video } from "lucide-react";
 import React from "react";
+import CancelMeetingButton from "./cancel-meeting";
 
 const MeetingList = ({ meetings, type }) => {
   if (meetings.length === 0) {
@@ -55,9 +56,11 @@ const MeetingList = ({ meetings, type }) => {
                 </div>
               )}
             </CardContent>
-            <CardFooter>
-              <Button variant="destructive">Cancel Meeting</Button>
-            </CardFooter>
+            {type === "upcoming" && (
+              <CardFooter>
+                <CancelMeetingButton meetingId={meeting.id} />
+              </CardFooter>
+            )}
           </Card>
         );
       })}
