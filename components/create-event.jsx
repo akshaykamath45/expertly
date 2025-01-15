@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -30,26 +31,29 @@ export function CreateEventDrawer() {
       setIsOpen(true);
     }
   }, [searchParams]);
+
   return (
-    <Drawer open={isOpen} onClose={handleClose}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Create new event</DrawerTitle>
-        </DrawerHeader>
-        <EventForm
-          onSubmitForm={() => {
-            handleClose();
-          }}
-        />
-        <DrawerFooter>
-          <DrawerClose asChild>
-            <Button variant="outline" onClick={handleClose}>
-              Cancel
-            </Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Drawer open={isOpen} onClose={handleClose}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Create new event</DrawerTitle>
+          </DrawerHeader>
+          <EventForm
+            onSubmitForm={() => {
+              handleClose();
+            }}
+          />
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button variant="outline" onClick={handleClose}>
+                Cancel
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </Suspense>
   );
 }
 
