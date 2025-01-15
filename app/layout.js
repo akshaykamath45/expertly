@@ -4,7 +4,7 @@ import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import CreateEventDrawer from "@/components/create-event";
 export const metadata = {
-  title: "Schedullr",
+  title: "Expertly",
   description: "One stop solution to schedule your appointments/bookings",
 };
 
