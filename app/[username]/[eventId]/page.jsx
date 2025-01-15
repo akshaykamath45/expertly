@@ -2,6 +2,7 @@ import { getEventDetails } from "@/actions/events";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import EventDetails from "./_components/event-details";
+import BookingForm from "./_components/booking-form";
 export async function generateMetadata({ params }) {
   const event = await getEventDetails(params.username, params.eventId);
   if (!event) {
@@ -23,10 +24,9 @@ const EventPage = async ({ params }) => {
   return (
     <div className="flex flex-col justify-center lg:flex-row px-4 py-8">
       <EventDetails event={event} />
-      {/*
       <Suspense fallback={<div>Loading booking form...</div>}>
         <BookingForm />
-      </Suspense> */}
+      </Suspense>
     </div>
   );
 };
