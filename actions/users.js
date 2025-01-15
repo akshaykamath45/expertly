@@ -19,7 +19,7 @@ export async function updateUsername(username) {
   const existingUser = await db.user.findUnique({
     where: { username },
   });
-  console.log(existingUser);
+//   console.log(existingUser);
 
   if (existingUser && existingUser.clerkUserId !== userId) {
     throw new Error("Username is already taken.");
@@ -35,7 +35,7 @@ export async function updateUsername(username) {
   await clerkClient.users.updateUser(userId, {
     username,
   });
-  console.log("Updating Clerk user:", { userId, username });
+//   console.log("Updating Clerk user:", { userId, username });
 
   return { success: true };
 }
